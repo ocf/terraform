@@ -1,0 +1,14 @@
+# Ignore all GCP credential files (can be scoped down again if improperly
+# matching other JSON files)
+*.json
+
+# Ignore terraform cache and downloaded terraform binaries
+.terraform/
+bin/terraform*
+
+# Ignore emacs temp files
+\#*\#
+*~
+
+# Ignore vim swp files
+*.swp
