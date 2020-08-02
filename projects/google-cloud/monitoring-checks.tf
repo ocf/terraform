@@ -159,6 +159,10 @@ module "jenkins" {
   content_match         = "Jenkins"
   project_id            = local.project_id
   notification_channels = local.default_channels
+  # This can be flaky, especially when restarting after plugins have updated.
+  # We don't really mind if this is down for a while since it's internal-only,
+  # as long as we are alerted sometime.
+  trigger_count         = 5
   documentation         = "Check if https://jenkins.ocf.berkeley.edu is available"
 }
 
