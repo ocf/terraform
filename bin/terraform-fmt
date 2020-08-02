@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -e
+
+REPO_ROOT=$(git rev-parse --show-toplevel)
+
+for file in "$@"; do
+  pushd "$(dirname "$file")" >/dev/null
+  "$REPO_ROOT"/bin/terraform fmt -write=true "$(basename "$file")"
+  popd >/dev/null
+done

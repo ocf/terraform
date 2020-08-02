@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -e
+
+REPO_ROOT=$(git rev-parse --show-toplevel)
+
+for dir in $(echo "$@" | xargs -n1 dirname | sort -u | uniq); do
+  pushd "$dir" >/dev/null
+  "$REPO_ROOT"/bin/terraform init -backend=false
+  "$REPO_ROOT"/bin/terraform validate
+  popd >/dev/null
+done
