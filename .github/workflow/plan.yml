@@ -1,0 +1,32 @@
+name: plan
+
+# Controls when the action will run. Triggers the workflow only on pull request
+# events and for merging into the master branch
+on:
+  pull_request:
+    branches: [master]
+
+jobs:
+  build:
+    # Unfortunately, there is no debian-latest provided :(
+    runs-on: ubuntu-latest
+
+    # Tasks run as part of the job
+    steps:
+    # Check out the repository under $GITHUB_WORKSPACE
+    - uses: actions/checkout@v2
+
+    # The Makefile will deal with installing terraform, etc. automatically as a dependency
+    - name: make plan
+      run: make plan
+
+    - name: comment on pull request
+      uses: actions/github-script@v2
+      with:
+        script: |
+          github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: 'Test comment from GitHub Actions'
+          })
