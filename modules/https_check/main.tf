@@ -29,6 +29,7 @@ resource "google_monitoring_uptime_check_config" "https_check" {
 module "https_uptime_alert" {
   source = "../uptime_alert"
 
+  trigger_count         = var.trigger_count
   uptime_check_id       = google_monitoring_uptime_check_config.https_check.uptime_check_id
   notification_channels = var.notification_channels
   documentation         = var.documentation
