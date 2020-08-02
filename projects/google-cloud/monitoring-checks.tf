@@ -1,6 +1,6 @@
 # Default notification channels (notify both Slack and mon@ email)
 locals {
-  project_id       = google_project.ocf.project_id
+  project_id = google_project.ocf.project_id
   default_channels = [
     data.google_monitoring_notification_channel.slack-alerts.name,
     google_monitoring_notification_channel.email-mon.name,
@@ -164,7 +164,7 @@ module "jenkins" {
 module "element" {
   source = "../../modules/https_check"
 
-  host                  = "chat.ocf.berkeley.edu"
+  host = "chat.ocf.berkeley.edu"
   # Would be nice to match on something else, but oh well
   content_match         = "Sorry, Element requires JavaScript"
   project_id            = local.project_id
@@ -275,7 +275,7 @@ module "ssh" {
 module "smtp" {
   source = "../../modules/tcp_check"
 
-  host                  = "smtp.ocf.berkeley.edu"
+  host = "smtp.ocf.berkeley.edu"
   # Would be nice if we could do a SSL check here too, but unfortunately that
   # doesn't appear to be an option with a TCP check
   port                  = 587
@@ -290,7 +290,7 @@ module "smtp" {
 module "dns" {
   source = "../../modules/tcp_check"
 
-  host                  = "ns.ocf.berkeley.edu"
+  host = "ns.ocf.berkeley.edu"
   # Yes, DNS is typically over UDP, but we also have it over TCP and there's no
   # UDP uptime check... :(
   port                  = 53
@@ -325,8 +325,8 @@ module "webirc" {
 #####   TLS/SSL certificate expiration (aggregate for all HTTPS checks)   #####
 ###############################################################################
 resource "google_monitoring_alert_policy" "cert-expiration" {
-  display_name          = "cert-expiration"
-  combiner              = "OR"
+  display_name = "cert-expiration"
+  combiner     = "OR"
   notification_channels = [
     data.google_monitoring_notification_channel.slack-alerts.name,
     google_monitoring_notification_channel.email-mon.name,
