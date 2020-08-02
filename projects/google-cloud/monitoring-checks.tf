@@ -28,6 +28,25 @@ module "ocf_io" {
   notification_channels = local.default_channels
   documentation         = "Check if the OCF website is up and responding at https://ocf.io/"
 }
+module "static" {
+  source = "../../modules/https_check"
+
+  host                  = "static.ocf.berkeley.edu"
+  path                  = "/scss/site.scss.css"
+  content_match         = "Bootstrap"
+  project_id            = local.project_id
+  notification_channels = local.default_channels
+  documentation         = "Check that the CSS on the OCF website is loading properly"
+}
+module "new" {
+  source = "../../modules/https_check"
+
+  host                  = "new.ocf.berkeley.edu"
+  content_match         = "Open Computing Facility"
+  project_id            = local.project_id
+  notification_channels = local.default_channels
+  documentation         = "Check that https://new.ocf.berkeley.edu is up and responding"
+}
 
 ###############################################################################
 #####   Vhosting                                                          #####
@@ -86,6 +105,21 @@ module "dev_apphost" {
 }
 
 ###############################################################################
+#####   Auth (keycloak)                                                   #####
+###############################################################################
+module "auth" {
+  source = "../../modules/https_check"
+
+  host = "auth.ocf.berkeley.edu"
+  # Keycloak has a meta refresh thing which means we can't check for the end
+  # state unfortunately, but we can check that it loads something correct
+  content_match         = "If you are not redirected automatically"
+  project_id            = local.project_id
+  notification_channels = local.default_channels
+  documentation         = "Check if keycloak is up in kubernetes and https://auth.ocf.berkeley.edu is available"
+}
+
+###############################################################################
 #####   Templates                                                         #####
 ###############################################################################
 module "templates" {
@@ -96,6 +130,19 @@ module "templates" {
   project_id            = local.project_id
   notification_channels = local.default_channels
   documentation         = "Check if https://templates.ocf.berkeley.edu is available"
+}
+
+###############################################################################
+#####   Sourcegraph                                                       #####
+###############################################################################
+module "sourcegraph" {
+  source = "../../modules/https_check"
+
+  host                  = "sourcegraph.ocf.berkeley.edu"
+  content_match         = "Sourcegraph Search"
+  project_id            = local.project_id
+  notification_channels = local.default_channels
+  documentation         = "Check if https://sourcegraph.ocf.berkeley.edu is available"
 }
 
 ###############################################################################
@@ -158,6 +205,46 @@ module "mastodon" {
   project_id            = local.project_id
   notification_channels = local.default_channels
   documentation         = "Check that mastodon is up in kubernetes and at https://mastodon.ocf.berkeley.edu"
+}
+
+###############################################################################
+#####   Lab Map                                                           #####
+###############################################################################
+module "labmap" {
+  source = "../../modules/https_check"
+
+  host                  = "labmap.ocf.berkeley.edu"
+  content_match         = "Lab Map"
+  project_id            = local.project_id
+  notification_channels = local.default_channels
+  documentation         = "Check that labmap is up in kubernetes and at https://labmap.ocf.berkeley.edu"
+}
+
+###############################################################################
+#####   Print List                                                        #####
+###############################################################################
+module "printlist" {
+  source = "../../modules/https_check"
+
+  host                  = "printlist.ocf.berkeley.edu"
+  path                  = "/home"
+  content_match         = "Print List"
+  project_id            = local.project_id
+  notification_channels = local.default_channels
+  documentation         = "Check that printlist is up in kubernetes and at https://printlist.ocf.berkeley.edu/home"
+}
+
+###############################################################################
+#####   phpMyAdmin (pma)                                                  #####
+###############################################################################
+module "pma" {
+  source = "../../modules/https_check"
+
+  host                  = "pma.ocf.berkeley.edu"
+  content_match         = "phpMyAdmin"
+  project_id            = local.project_id
+  notification_channels = local.default_channels
+  documentation         = "Check that pma is up in kubernetes and at https://pma.ocf.berkeley.edu"
 }
 
 ###############################################################################
