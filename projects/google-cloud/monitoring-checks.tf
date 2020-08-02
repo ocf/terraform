@@ -1,631 +1,241 @@
+# Default notification channels (notify both Slack and mon@ email)
+locals {
+  project_id       = google_project.ocf.project_id
+  default_channels = [
+    data.google_monitoring_notification_channel.slack-alerts.name,
+    google_monitoring_notification_channel.email-mon.name,
+  ]
+}
+
 ###############################################################################
 #####   The OCF website                                                   #####
 ###############################################################################
-resource "google_monitoring_uptime_check_config" "ocfweb" {
-  display_name = "ocfweb"
-  timeout      = "10s"
-  period       = "60s"
+module "ocfweb" {
+  source = "../../modules/https_check"
 
-  content_matchers {
-    content = "Open Computing Facility"
-    matcher = "CONTAINS_STRING"
-  }
-
-  http_check {
-    path         = "/"
-    use_ssl      = true
-    validate_ssl = true
-  }
-
-  monitored_resource {
-    type = "uptime_url"
-    labels = {
-      project_id = google_project.ocf.project_id
-      host       = "ocf.berkeley.edu"
-    }
-  }
-}
-
-module "ocfweb_uptime_alert" {
-  source = "../../modules/uptime-alert"
-
-  uptime_check          = google_monitoring_uptime_check_config.ocfweb
-  notification_channels = [
-    data.google_monitoring_notification_channel.slack-alerts.name,
-    google_monitoring_notification_channel.email-mon.name,
-  ]
+  host                  = "ocf.berkeley.edu"
+  content_match         = "Open Computing Facility"
+  project_id            = local.project_id
+  notification_channels = local.default_channels
   documentation         = "Check if the OCF website is up and responding at https://www.ocf.berkeley.edu/"
 }
+module "ocf_io" {
+  source = "../../modules/https_check"
 
-resource "google_monitoring_uptime_check_config" "ocf-io" {
-  display_name = "ocf-io"
-  timeout      = "10s"
-  period       = "60s"
-
-  content_matchers {
-    content = "Open Computing Facility"
-    matcher = "CONTAINS_STRING"
-  }
-
-  http_check {
-    path         = "/"
-    use_ssl      = true
-    validate_ssl = true
-  }
-
-  monitored_resource {
-    type = "uptime_url"
-    labels = {
-      project_id = google_project.ocf.project_id
-      host       = "ocf.io"
-    }
-  }
-}
-
-module "ocf_io_uptime_alert" {
-  source = "../../modules/uptime-alert"
-
-  uptime_check          = google_monitoring_uptime_check_config.ocf-io
-  notification_channels = [
-    data.google_monitoring_notification_channel.slack-alerts.name,
-    google_monitoring_notification_channel.email-mon.name,
-  ]
+  host                  = "ocf.io"
+  content_match         = "Open Computing Facility"
+  project_id            = local.project_id
+  notification_channels = local.default_channels
   documentation         = "Check if the OCF website is up and responding at https://ocf.io/"
 }
 
 ###############################################################################
 #####   Vhosting                                                          #####
 ###############################################################################
-resource "google_monitoring_uptime_check_config" "dev-vhost-cgi" {
-  display_name = "dev-vhost-cgi"
-  timeout      = "5s"
-  period       = "60s"
+module "dev_vhost_cgi" {
+  source = "../../modules/https_check"
 
-  content_matchers {
-    content = "ggroup"
-    matcher = "CONTAINS_STRING"
-  }
-
-  http_check {
-    path         = "/whoami.cgi"
-    use_ssl      = true
-    validate_ssl = true
-  }
-
-  monitored_resource {
-    type = "uptime_url"
-    labels = {
-      project_id = google_project.ocf.project_id
-      host       = "dev-vhost.ocf.berkeley.edu"
-    }
-  }
-}
-
-module "dev_vhost_cgi_uptime_alert" {
-  source = "../../modules/uptime-alert"
-
-  uptime_check          = google_monitoring_uptime_check_config.dev-vhost-cgi
-  notification_channels = [
-    data.google_monitoring_notification_channel.slack-alerts.name,
-    google_monitoring_notification_channel.email-mon.name,
-  ]
+  host                  = "dev-vhost.ocf.berkeley.edu"
+  path                  = "/whoami.cgi"
+  content_match         = "ggroup"
+  project_id            = local.project_id
+  notification_channels = local.default_channels
   documentation         = "Check if https://dev-vhost.ocf.berkeley.edu/whoami.cgi loads and is working"
 }
+module "dev_vhost_php" {
+  source = "../../modules/https_check"
 
-resource "google_monitoring_uptime_check_config" "dev-vhost-php" {
-  display_name = "dev-vhost-php"
-  timeout      = "5s"
-  period       = "60s"
-
-  content_matchers {
-    content = "ggroup"
-    matcher = "CONTAINS_STRING"
-  }
-
-  http_check {
-    path         = "/whoami.php"
-    use_ssl      = true
-    validate_ssl = true
-  }
-
-  monitored_resource {
-    type = "uptime_url"
-    labels = {
-      project_id = google_project.ocf.project_id
-      host       = "dev-vhost.ocf.berkeley.edu"
-    }
-  }
-}
-
-module "dev_vhost_php_uptime_alert" {
-  source = "../../modules/uptime-alert"
-
-  uptime_check          = google_monitoring_uptime_check_config.dev-vhost-php
-  notification_channels = [
-    data.google_monitoring_notification_channel.slack-alerts.name,
-    google_monitoring_notification_channel.email-mon.name,
-  ]
+  host                  = "dev-vhost.ocf.berkeley.edu"
+  path                  = "/whoami.php"
+  content_match         = "ggroup"
+  project_id            = local.project_id
+  notification_channels = local.default_channels
   documentation         = "Check if https://dev-vhost.ocf.berkeley.edu/whoami.php loads and is working"
 }
+module "dev_vhost_flask" {
+  source = "../../modules/https_check"
 
-resource "google_monitoring_uptime_check_config" "dev-vhost-flask" {
-  display_name = "dev-vhost-flask"
-  timeout      = "5s"
-  period       = "60s"
-
-  content_matchers {
-    content = "flask-vhost"
-    matcher = "CONTAINS_STRING"
-  }
-
-  http_check {
-    path         = "/flask-vhost/"
-    use_ssl      = true
-    validate_ssl = true
-  }
-
-  monitored_resource {
-    type = "uptime_url"
-    labels = {
-      project_id = google_project.ocf.project_id
-      host       = "dev-vhost.ocf.berkeley.edu"
-    }
-  }
-}
-
-module "dev_vhost_flask_uptime_alert" {
-  source = "../../modules/uptime-alert"
-
-  uptime_check          = google_monitoring_uptime_check_config.dev-vhost-flask
-  notification_channels = [
-    data.google_monitoring_notification_channel.slack-alerts.name,
-    google_monitoring_notification_channel.email-mon.name,
-  ]
+  host                  = "dev-vhost.ocf.berkeley.edu"
+  path                  = "/flask-vhost/"
+  content_match         = "flask-vhost"
+  project_id            = local.project_id
+  notification_channels = local.default_channels
   documentation         = "Check if https://dev-vhost.ocf.berkeley.edu/flask-vhost/ loads and is working"
 }
+module "dev_vhost_alias" {
+  source = "../../modules/https_check"
 
-resource "google_monitoring_uptime_check_config" "dev-vhost-alias" {
-  display_name = "dev-vhost-alias"
-  timeout      = "5s"
-  period       = "60s"
-
-  content_matchers {
-    content = "Index of /"
-    matcher = "CONTAINS_STRING"
-  }
-
-  http_check {
-    path         = "/"
-    use_ssl      = true
-    validate_ssl = true
-  }
-
-  monitored_resource {
-    type = "uptime_url"
-    labels = {
-      project_id = google_project.ocf.project_id
-      host       = "dev-vhost-alias.ocf.berkeley.edu"
-    }
-  }
-}
-
-module "dev_vhost_alias_uptime_alert" {
-  source = "../../modules/uptime-alert"
-
-  uptime_check          = google_monitoring_uptime_check_config.dev-vhost-alias
-  notification_channels = [
-    data.google_monitoring_notification_channel.slack-alerts.name,
-    google_monitoring_notification_channel.email-mon.name,
-  ]
+  host                  = "dev-vhost-alias.ocf.berkeley.edu"
+  content_match         = "Index of /"
+  project_id            = local.project_id
+  notification_channels = local.default_channels
   documentation         = "Check if https://dev-vhost-alias.ocf.berkeley.edu/ loads and is working"
 }
 
 ###############################################################################
 #####   Apphosting                                                        #####
 ###############################################################################
-resource "google_monitoring_uptime_check_config" "dev-app" {
-  display_name = "dev-app"
-  timeout      = "5s"
-  period       = "60s"
+module "dev_apphost" {
+  source = "../../modules/https_check"
 
-  content_matchers {
-    content = "congratulations, you are the"
-    matcher = "CONTAINS_STRING"
-  }
-
-  http_check {
-    path         = "/"
-    use_ssl      = true
-    validate_ssl = true
-  }
-
-  monitored_resource {
-    type = "uptime_url"
-    labels = {
-      project_id = google_project.ocf.project_id
-      host       = "dev-app.ocf.berkeley.edu"
-    }
-  }
-}
-
-module "dev_app_uptime_alert" {
-  source = "../../modules/uptime-alert"
-
-  uptime_check          = google_monitoring_uptime_check_config.dev-app
-  notification_channels = [
-    data.google_monitoring_notification_channel.slack-alerts.name,
-    google_monitoring_notification_channel.email-mon.name,
-  ]
+  host                  = "dev-app.ocf.berkeley.edu"
+  content_match         = "congratulations, you are the"
+  project_id            = local.project_id
+  notification_channels = local.default_channels
   documentation         = "Check if https://dev-app.ocf.berkeley.edu/ loads and is working"
 }
 
 ###############################################################################
 #####   Templates                                                         #####
 ###############################################################################
-resource "google_monitoring_uptime_check_config" "templates" {
-  display_name = "templates"
-  timeout      = "5s"
-  period       = "60s"
+module "templates" {
+  source = "../../modules/https_check"
 
-  content_matchers {
-    content = "user-what-is-wordpress"
-    matcher = "CONTAINS_STRING"
-  }
-
-  http_check {
-    path         = "/"
-    use_ssl      = true
-    validate_ssl = true
-  }
-
-  monitored_resource {
-    type = "uptime_url"
-    labels = {
-      project_id = google_project.ocf.project_id
-      host       = "templates.ocf.berkeley.edu"
-    }
-  }
-}
-
-module "templates_uptime_alert" {
-  source = "../../modules/uptime-alert"
-
-  uptime_check          = google_monitoring_uptime_check_config.templates
-  notification_channels = [
-    data.google_monitoring_notification_channel.slack-alerts.name,
-    google_monitoring_notification_channel.email-mon.name,
-  ]
-  documentation         = "Check if the templates site is up and responding at https://templates.ocf.berkeley.edu"
+  host                  = "templates.ocf.berkeley.edu"
+  content_match         = "user-what-is-wordpress"
+  project_id            = local.project_id
+  notification_channels = local.default_channels
+  documentation         = "Check if https://templates.ocf.berkeley.edu is available"
 }
 
 ###############################################################################
 #####   Jenkins                                                           #####
 ###############################################################################
-resource "google_monitoring_uptime_check_config" "jenkins" {
-  display_name = "jenkins"
-  timeout      = "10s"
-  period       = "60s"
+module "jenkins" {
+  source = "../../modules/https_check"
 
-  content_matchers {
-    content = "Jenkins"
-    matcher = "CONTAINS_STRING"
-  }
-
-  http_check {
-    path         = "/"
-    use_ssl      = true
-    validate_ssl = true
-  }
-
-  monitored_resource {
-    type = "uptime_url"
-    labels = {
-      project_id = google_project.ocf.project_id
-      host       = "jenkins.ocf.berkeley.edu"
-    }
-  }
-}
-
-module "jenkins_uptime_alert" {
-  source = "../../modules/uptime-alert"
-
-  uptime_check          = google_monitoring_uptime_check_config.jenkins
-  notification_channels = [
-    data.google_monitoring_notification_channel.slack-alerts.name,
-    google_monitoring_notification_channel.email-mon.name,
-  ]
-  documentation         = "Check if Jenkins is up and responding at https://jenkins.ocf.berkeley.edu"
+  host                  = "jenkins.ocf.berkeley.edu"
+  content_match         = "Jenkins"
+  project_id            = local.project_id
+  notification_channels = local.default_channels
+  documentation         = "Check if https://jenkins.ocf.berkeley.edu is available"
 }
 
 ###############################################################################
-#####   Element                                                           #####
+#####   Matrix (element + synapse)                                        #####
 ###############################################################################
-resource "google_monitoring_uptime_check_config" "element" {
-  display_name = "element"
-  timeout      = "5s"
-  period       = "60s"
+module "element" {
+  source = "../../modules/https_check"
 
-  content_matchers {
-    # Would be nice to match on something else, but oh well
-    content = "Sorry, Element requires JavaScript"
-    matcher = "CONTAINS_STRING"
-  }
-
-  http_check {
-    path         = "/"
-    use_ssl      = true
-    validate_ssl = true
-  }
-
-  monitored_resource {
-    type = "uptime_url"
-    labels = {
-      project_id = google_project.ocf.project_id
-      host       = "chat.ocf.berkeley.edu"
-    }
-  }
-}
-
-module "element_uptime_alert" {
-  source = "../../modules/uptime-alert"
-
-  uptime_check          = google_monitoring_uptime_check_config.element
-  notification_channels = [
-    data.google_monitoring_notification_channel.slack-alerts.name,
-    google_monitoring_notification_channel.email-mon.name,
-  ]
+  host                  = "chat.ocf.berkeley.edu"
+  # Would be nice to match on something else, but oh well
+  content_match         = "Sorry, Element requires JavaScript"
+  project_id            = local.project_id
+  notification_channels = local.default_channels
   documentation         = "Check that element (aka matrix) is up and responding in kubernetes and at https://chat.ocf.berkeley.edu"
 }
+module "synapse" {
+  source = "../../modules/https_check"
 
-###############################################################################
-#####   Synapse                                                           #####
-###############################################################################
-resource "google_monitoring_uptime_check_config" "synapse" {
-  display_name = "synapse"
-  timeout      = "5s"
-  period       = "60s"
-
-  content_matchers {
-    content = "It works! Synapse is running"
-    matcher = "CONTAINS_STRING"
-  }
-
-  http_check {
-    path         = "/"
-    use_ssl      = true
-    validate_ssl = true
-  }
-
-  monitored_resource {
-    type = "uptime_url"
-    labels = {
-      project_id = google_project.ocf.project_id
-      host       = "matrix.ocf.berkeley.edu"
-    }
-  }
-}
-
-module "synapse_uptime_alert" {
-  source = "../../modules/uptime-alert"
-
-  uptime_check          = google_monitoring_uptime_check_config.synapse
-  notification_channels = [
-    data.google_monitoring_notification_channel.slack-alerts.name,
-    google_monitoring_notification_channel.email-mon.name,
-  ]
+  host                  = "matrix.ocf.berkeley.edu"
+  content_match         = "It works! Synapse is running"
+  project_id            = local.project_id
+  notification_channels = local.default_channels
   documentation         = "Check that synapse (aka matrix) is up and responding in kubernetes and at https://matrix.ocf.berkeley.edu"
 }
 
 ###############################################################################
 #####   Mirrors                                                           #####
 ###############################################################################
-resource "google_monitoring_uptime_check_config" "mirrors" {
-  display_name = "mirrors"
-  timeout      = "5s"
-  period       = "60s"
+module "mirrors" {
+  source = "../../modules/https_check"
 
-  content_matchers {
-    content = "Open Computing Facility Mirrors"
-    matcher = "CONTAINS_STRING"
-  }
-
-  http_check {
-    path         = "/"
-    use_ssl      = true
-    validate_ssl = true
-  }
-
-  monitored_resource {
-    type = "uptime_url"
-    labels = {
-      project_id = google_project.ocf.project_id
-      host       = "mirrors.ocf.berkeley.edu"
-    }
-  }
+  host                  = "mirrors.ocf.berkeley.edu"
+  content_match         = "Open Computing Facility Mirrors"
+  project_id            = local.project_id
+  notification_channels = local.default_channels
+  documentation         = "Check that our mirrors are up at https://mirrors.ocf.berkeley.edu"
 }
 
-module "mirrors_uptime_alert" {
-  source = "../../modules/uptime-alert"
+###############################################################################
+#####   Mastodon                                                          #####
+###############################################################################
+module "mastodon" {
+  source = "../../modules/https_check"
 
-  uptime_check          = google_monitoring_uptime_check_config.mirrors
-  notification_channels = [
-    data.google_monitoring_notification_channel.slack-alerts.name,
-    google_monitoring_notification_channel.email-mon.name,
-  ]
-  documentation         = "Check that our mirrors are up at https://mirrors.ocf.berkeley.edu"
+  host                  = "mastodon.ocf.berkeley.edu"
+  content_match         = "OCF Mastodon"
+  project_id            = local.project_id
+  notification_channels = local.default_channels
+  documentation         = "Check that mastodon is up in kubernetes and at https://mastodon.ocf.berkeley.edu"
 }
 
 ###############################################################################
 #####   SSH and shell-in-a-box                                            #####
 ###############################################################################
-resource "google_monitoring_uptime_check_config" "webssh" {
-  display_name = "webssh"
-  timeout      = "10s"
-  period       = "60s"
+module "webssh" {
+  source = "../../modules/https_check"
 
-  content_matchers {
-    content = "ShellInABox"
-    matcher = "CONTAINS_STRING"
-  }
-
-  http_check {
-    path         = "/"
-    use_ssl      = true
-    validate_ssl = true
-  }
-
-  monitored_resource {
-    type = "uptime_url"
-    labels = {
-      project_id = google_project.ocf.project_id
-      host       = "ssh.ocf.berkeley.edu"
-    }
-  }
-}
-
-module "webssh_uptime_alert" {
-  source = "../../modules/uptime-alert"
-
-  uptime_check          = google_monitoring_uptime_check_config.webssh
-  notification_channels = [
-    data.google_monitoring_notification_channel.slack-alerts.name,
-    google_monitoring_notification_channel.email-mon.name,
-  ]
+  host                  = "ssh.ocf.berkeley.edu"
+  content_match         = "ShellInABox"
+  project_id            = local.project_id
+  notification_channels = local.default_channels
   documentation         = "Check that shell in a box (on tsunami) is up at https://ssh.ocf.berkeley.edu"
 }
+module "ssh" {
+  source = "../../modules/tcp_check"
 
-resource "google_monitoring_uptime_check_config" "ssh" {
-  display_name = "ssh"
-  timeout      = "5s"
-  period       = "60s"
-
-  tcp_check {
-    port = 22
-  }
-
-  monitored_resource {
-    type = "uptime_url"
-    labels = {
-      project_id = google_project.ocf.project_id
-      host       = "ssh.ocf.berkeley.edu"
-    }
-  }
-}
-
-module "ssh_uptime_alert" {
-  source = "../../modules/uptime-alert"
-
-  uptime_check          = google_monitoring_uptime_check_config.ssh
-  notification_channels = [
-    data.google_monitoring_notification_channel.slack-alerts.name,
-    google_monitoring_notification_channel.email-mon.name,
-  ]
+  host                  = "ssh.ocf.berkeley.edu"
+  port                  = 22
+  project_id            = local.project_id
+  notification_channels = local.default_channels
   documentation         = "Check if the SSH server on tsunami is up and running"
 }
 
 ###############################################################################
 #####   Email (SMTP)                                                      #####
 ###############################################################################
-resource "google_monitoring_uptime_check_config" "smtp" {
-  display_name = "smtp"
-  timeout      = "5s"
-  period       = "60s"
+module "smtp" {
+  source = "../../modules/tcp_check"
 
-  tcp_check {
-    # Would be nice if we could do a SSL check here too, but unfortunately that
-    # doesn't appear to be an option with a TCP check
-    port = 587
-  }
-
-  monitored_resource {
-    type = "uptime_url"
-    labels = {
-      project_id = google_project.ocf.project_id
-      host       = "smtp.ocf.berkeley.edu"
-    }
-  }
-}
-
-module "smtp_uptime_alert" {
-  source = "../../modules/uptime-alert"
-
-  uptime_check          = google_monitoring_uptime_check_config.smtp
-  notification_channels = [
-    data.google_monitoring_notification_channel.slack-alerts.name,
-    google_monitoring_notification_channel.email-mon.name,
-  ]
+  host                  = "smtp.ocf.berkeley.edu"
+  # Would be nice if we could do a SSL check here too, but unfortunately that
+  # doesn't appear to be an option with a TCP check
+  port                  = 587
+  project_id            = local.project_id
+  notification_channels = local.default_channels
   documentation         = "Check if the mail server is up and responding on port 587"
 }
 
 ###############################################################################
 #####   DNS                                                               #####
 ###############################################################################
-resource "google_monitoring_uptime_check_config" "dns" {
-  display_name = "dns"
-  timeout      = "1s"
-  period       = "60s"
+module "dns" {
+  source = "../../modules/tcp_check"
 
+  host                  = "ns.ocf.berkeley.edu"
   # Yes, DNS is typically over UDP, but we also have it over TCP and there's no
   # UDP uptime check... :(
-  tcp_check {
-    port = 53
-  }
-
-  monitored_resource {
-    type = "uptime_url"
-    labels = {
-      project_id = google_project.ocf.project_id
-      host       = "ns.ocf.berkeley.edu"
-    }
-  }
-}
-
-module "dns_uptime_alert" {
-  source = "../../modules/uptime-alert"
-
-  uptime_check          = google_monitoring_uptime_check_config.dns
-  notification_channels = [
-    data.google_monitoring_notification_channel.slack-alerts.name,
-    google_monitoring_notification_channel.email-mon.name,
-  ]
+  port                  = 53
+  project_id            = local.project_id
+  notification_channels = local.default_channels
   documentation         = "Check if `dig +tcp ocf.io @ns.ocf.berkeley.edu` succeeds"
 }
 
 ###############################################################################
-#####   IRC                                                               #####
+#####   IRC and Web IRC                                                   #####
 ###############################################################################
-resource "google_monitoring_uptime_check_config" "irc" {
-  display_name = "irc"
-  timeout      = "5s"
-  period       = "60s"
+module "irc" {
+  source = "../../modules/tcp_check"
 
-  tcp_check {
-    port = 6697
-  }
-
-  monitored_resource {
-    type = "uptime_url"
-    labels = {
-      project_id = google_project.ocf.project_id
-      host       = "irc.ocf.berkeley.edu"
-    }
-  }
-}
-
-module "irc_uptime_alert" {
-  source = "../../modules/uptime-alert"
-
-  uptime_check          = google_monitoring_uptime_check_config.irc
-  notification_channels = [
-    data.google_monitoring_notification_channel.slack-alerts.name,
-    google_monitoring_notification_channel.email-mon.name,
-  ]
+  host                  = "irc.ocf.berkeley.edu"
+  port                  = 6697
+  project_id            = local.project_id
+  notification_channels = local.default_channels
   documentation         = "Check that the IRC server is up on flood"
 }
+module "webirc" {
+  source = "../../modules/https_check"
 
+  host                  = "irc.ocf.berkeley.edu"
+  content_match         = "The Lounge"
+  project_id            = local.project_id
+  notification_channels = local.default_channels
+  documentation         = "Check that thelounge is up and running on kubernetes and that https://irc.ocf.berkeley.edu is working"
+}
 
 ###############################################################################
-#####   TLS/SSL certificate expiration                                    #####
+#####   TLS/SSL certificate expiration (aggregate for all HTTPS checks)   #####
 ###############################################################################
 resource "google_monitoring_alert_policy" "cert-expiration" {
   display_name          = "cert-expiration"

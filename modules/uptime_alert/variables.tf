@@ -1,11 +1,7 @@
 # Required variables
-variable "uptime_check" {
-  description = "The google_monitoring_uptime_check_config output"
-  type        = object({
-    id              = string
-    name            = string
-    uptime_check_id = string
-  })
+variable "uptime_check_id" {
+  description = "The google_monitoring_uptime_check_config ID to associate with"
+  type        = string
 }
 variable "notification_channels" {
   description = "A list of channels to send alert notifications to"
