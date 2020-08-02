@@ -2,9 +2,9 @@
 # matching other JSON files)
 *.json
 
-# Ignore terraform cache and downloaded terraform binaries
+# Ignore terraform cache and downloaded terraform binary
 .terraform/
-bin/terraform*
+bin/terraform
 
 # Ignore emacs temp files
 \#*\#
@@ -12,3 +12,6 @@ bin/terraform*
 
 # Ignore vim swp files
 *.swp
+
+# No virtualenvs checked in, thank you very much
+venv/

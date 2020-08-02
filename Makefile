@@ -6,6 +6,17 @@ BASE_URL = https://releases.hashicorp.com/terraform/${TF_VERSION}
 REPO_ROOT = $(shell git rev-parse --show-toplevel)
 TF_PATH = $(REPO_ROOT)/bin/terraform
 
+venv:
+	virtualenv -ppython3.7 venv
+	$(REPO_ROOT)/venv/bin/pip install pre-commit
+
+.PHONY: install-hooks
+install-hooks: venv
+	$(REPO_ROOT)/venv/bin/pre-commit install -f --install-hooks
+
+.PHONY: test
+test: venv install-hooks
+	$(REPO_ROOT)/venv/bin/pre-commit run --all-files
 
 # Set up the terraform binary, with some validation to make sure it's trusted
 # and contains the contents that Hashicorp has made checksums for.
