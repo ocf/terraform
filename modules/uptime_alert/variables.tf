@@ -22,7 +22,7 @@ variable "failing_duration" {
 variable "trigger_count" {
   description = "The amount of failures before the alert triggers"
   type        = number
-  default     = 1
+  default     = 2
 }
 variable "trigger_percent" {
   description = "The percent of alerts that are failing before the alert triggers"

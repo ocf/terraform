@@ -26,7 +26,7 @@ variable "timeout" {
 variable "trigger_count" {
   description = "The amount of failures before the alert triggers"
   type        = number
-  default     = 1
+  default     = 2
 }
 variable "content_match" {
   description = "Any content to match on the page as part of the monitoring check"

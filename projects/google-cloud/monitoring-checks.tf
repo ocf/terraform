@@ -36,11 +36,7 @@ module "static" {
   content_match         = "Bootstrap"
   project_id            = local.project_id
   notification_channels = local.default_channels
-  # This one is surprisingly flaky, seems to fail periodically due to hitting
-  # the timeout, but it only happens for 1-2 checks at a time before subsiding
-  # again
-  trigger_count = 3
-  documentation = "Check that the CSS on the OCF website is loading properly"
+  documentation         = "Check that the CSS on the OCF website is loading properly"
 }
 module "new" {
   source = "../../modules/https_check"
@@ -120,10 +116,7 @@ module "auth" {
   content_match         = "If you are not redirected automatically"
   project_id            = local.project_id
   notification_channels = local.default_channels
-  # This otherwise triggers during redeploys, and since it's mainly internal
-  # some downtime is acceptable
-  trigger_count = 2
-  documentation = "Check if keycloak is up in kubernetes and https://auth.ocf.berkeley.edu is available"
+  documentation         = "Check if keycloak is up in kubernetes and https://auth.ocf.berkeley.edu is available"
 }
 
 ###############################################################################
