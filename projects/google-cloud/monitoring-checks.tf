@@ -39,8 +39,8 @@ module "static" {
   # This one is surprisingly flaky, seems to fail periodically due to hitting
   # the timeout, but it only happens for 1-2 checks at a time before subsiding
   # again
-  trigger_count         = 3
-  documentation         = "Check that the CSS on the OCF website is loading properly"
+  trigger_count = 3
+  documentation = "Check that the CSS on the OCF website is loading properly"
 }
 module "new" {
   source = "../../modules/https_check"
@@ -120,7 +120,10 @@ module "auth" {
   content_match         = "If you are not redirected automatically"
   project_id            = local.project_id
   notification_channels = local.default_channels
-  documentation         = "Check if keycloak is up in kubernetes and https://auth.ocf.berkeley.edu is available"
+  # This otherwise triggers during redeploys, and since it's mainly internal
+  # some downtime is acceptable
+  trigger_count = 2
+  documentation = "Check if keycloak is up in kubernetes and https://auth.ocf.berkeley.edu is available"
 }
 
 ###############################################################################
@@ -162,8 +165,8 @@ module "jenkins" {
   # This can be flaky, especially when restarting after plugins have updated.
   # We don't really mind if this is down for a while since it's internal-only,
   # as long as we are alerted sometime.
-  trigger_count         = 5
-  documentation         = "Check if https://jenkins.ocf.berkeley.edu is available"
+  trigger_count = 5
+  documentation = "Check if https://jenkins.ocf.berkeley.edu is available"
 }
 
 ###############################################################################
