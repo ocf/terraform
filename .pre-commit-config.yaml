@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.2.0
+    rev: v3.3.0
     hooks:
       - id: check-added-large-files
       - id: check-byte-order-marker
@@ -14,7 +14,7 @@ repos:
       - id: mixed-line-ending
       - id: trailing-whitespace
   - repo: https://github.com/gruntwork-io/pre-commit
-    rev: v0.1.9
+    rev: v0.1.11
     hooks:
       - id: shellcheck
   # These are local checks because we have a custom terraform binary location
