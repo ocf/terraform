@@ -28,7 +28,7 @@ test: venv install-hooks
 # set up as needed.
 bin/terraform:
 	# Import the Hashicorp GPG key to validate the checksums
-	gpg --recv-keys 51852D87348FFC4C
+	gpg --keyserver keys.gnupg.net --recv-keys 91A6E7F85D05C65630BEF18951852D87348FFC4C
 
 	# Download the zip file with the terraform binary, the checksums, and the
 	# checksum signature file
