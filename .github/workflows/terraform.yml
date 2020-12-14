@@ -1,0 +1,37 @@
+name: 'Terraform'
+
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+
+jobs:
+  terraform:
+    name: 'Terraform'
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+
+    - name: Run tests
+      run: make test
+
+    # Populate secrets and generate an execution plan
+    - name: Terraform plan
+      run: |
+        echo "$TERRAFORM_GCP_RO" > /tmp/terraform-ro.json
+        make plan
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS: '/tmp/terraform-ro.json'
+        TERRAFORM_GCP_RO: ${{secrets.TERRAFORM_GCP_RO}}
+
+    # On push to master, apply terraform changes
+    - name: Terraform apply
+      run: $GITHUB_WORKSPACE/bin/terraform apply -auto-approve
+      if: github.ref == 'refs/heads/master' && github.event_name == 'push'
