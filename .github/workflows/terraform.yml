@@ -19,11 +19,11 @@ jobs:
     - name: Checkout repo
       uses: actions/checkout@v2
 
-    - name: Run tests
-      run: make test
-
     - name: Setup terraform
       run: make bin/terraform
+
+    - name: Run tests
+      run: make test
 
     - name: Populate GCP RO secret
       run: echo "$TERRAFORM_GCP_RO" > /tmp/terraform-ro.json
