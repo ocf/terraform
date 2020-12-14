@@ -7,7 +7,10 @@ REPO_ROOT = $(shell git rev-parse --show-toplevel)
 TF_PATH = $(REPO_ROOT)/bin/terraform
 
 venv:
-	virtualenv -ppython3.7 venv
+	# Try to use python3.7 if it's available (on OCF machines for instance),
+	# otherwise fall back to using whatever python3 version is around (GitHub
+	# Actions for instance)
+	python3.7 -m venv venv || python3 -m venv venv
 	$(REPO_ROOT)/venv/bin/pip install pre-commit
 
 .PHONY: install-hooks
