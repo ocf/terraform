@@ -31,9 +31,26 @@ jobs:
         TERRAFORM_GCP_RO: ${{secrets.TERRAFORM_GCP_RO}}
 
     - name: Terraform plan
-      run: make plan
+      run: make plan | tee /tmp/terraform-plan-output
       env:
         GOOGLE_APPLICATION_CREDENTIALS: '/tmp/terraform-ro.json'
+
+    - name: Comment plan on pull request
+      if: github.ref != 'refs/heads/master'
+      uses: actions/github-script@v3
+      with:
+        script: |
+          const { promises: fs } = require('fs')
+          // Read in terraform plan content from the previous step so that it
+          // can be put into a pull request comment
+          const content = await fs.readFile('/tmp/terraform-plan-output', 'utf8')
+
+          github.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: content,
+          })
 
     - name: Populate GCP RW secret
       if: github.ref == 'refs/heads/master' && github.event_name == 'push'
