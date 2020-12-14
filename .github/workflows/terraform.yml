@@ -22,16 +22,28 @@ jobs:
     - name: Run tests
       run: make test
 
-    # Populate secrets and generate an execution plan
+    - name: Setup terraform
+      run: make bin/terraform
+
+    - name: Populate GCP RO secret
+      run: echo "$TERRAFORM_GCP_RO" > /tmp/terraform-ro.json
+      env:
+        TERRAFORM_GCP_RO: ${{secrets.TERRAFORM_GCP_RO}}
+
     - name: Terraform plan
-      run: |
-        echo "$TERRAFORM_GCP_RO" > /tmp/terraform-ro.json
-        make plan
+      run: make plan
       env:
         GOOGLE_APPLICATION_CREDENTIALS: '/tmp/terraform-ro.json'
-        TERRAFORM_GCP_RO: ${{secrets.TERRAFORM_GCP_RO}}
+
+    - name: Populate GCP RW secret
+      if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+      run: echo "$TERRAFORM_GCP_RW" > /tmp/terraform-rw.json
+      env:
+        TERRAFORM_GCP_RW: ${{secrets.TERRAFORM_GCP_RW}}
 
     # On push to master, apply terraform changes
     - name: Terraform apply
-      run: $GITHUB_WORKSPACE/bin/terraform apply -auto-approve
       if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+      run: make force-apply
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS: '/tmp/terraform-rw.json'
