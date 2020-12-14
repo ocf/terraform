@@ -17,12 +17,7 @@ variable "documentation" {
 variable "failing_duration" {
   description = "The amount of time in seconds that the check has to fail before it alerts"
   type        = number
-  default     = 0
-}
-variable "trigger_count" {
-  description = "The amount of failures before the alert triggers"
-  type        = number
-  default     = 2
+  default     = 120
 }
 variable "trigger_percent" {
   description = "The percent of alerts that are failing before the alert triggers"

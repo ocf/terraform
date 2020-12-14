@@ -16,14 +16,14 @@ resource "google_monitoring_alert_policy" "uptime_alert" {
       threshold_value = 1
 
       aggregations {
-        alignment_period     = "1200s"
+        alignment_period     = "60s"
         cross_series_reducer = "REDUCE_COUNT_FALSE"
         group_by_fields      = ["resource.*"]
         per_series_aligner   = "ALIGN_NEXT_OLDER"
       }
 
       trigger {
-        count   = var.trigger_count
+        count   = 1
         percent = var.trigger_percent
       }
     }

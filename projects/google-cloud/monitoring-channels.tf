@@ -9,6 +9,6 @@ resource "google_monitoring_notification_channel" "email-mon" {
 # This has been set up manually since it includes a step to authenticate with
 # Slack and would need an auth token to be provided here otherwise
 data "google_monitoring_notification_channel" "slack-alerts" {
-  display_name = "alerts"
+  display_name = "#alerts"
   type         = "slack"
 }

@@ -18,15 +18,15 @@ variable "documentation" {
 
 
 # Optional variables
+variable "failing_duration" {
+  description = "The amount of time in seconds that the check has to fail before it alerts"
+  type        = number
+  default     = 120
+}
 variable "timeout" {
   description = "The default timeout before failing the check"
   type        = number
   default     = 10
-}
-variable "trigger_count" {
-  description = "The amount of failures before the alert triggers"
-  type        = number
-  default     = 2
 }
 variable "content_match" {
   description = "Any content to match on the page as part of the monitoring check"
