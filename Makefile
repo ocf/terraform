@@ -18,7 +18,7 @@ install-hooks: venv
 	$(REPO_ROOT)/venv/bin/pre-commit install -f --install-hooks
 
 .PHONY: test
-test: venv install-hooks
+test: venv install-hooks bin/terraform
 	$(REPO_ROOT)/venv/bin/pre-commit run --all-files
 
 # Set up the terraform binary, with some validation to make sure it's trusted

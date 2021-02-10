@@ -24,6 +24,11 @@ jobs:
 
     - name: Run tests
       run: make test
+      env:
+        # terraform-validate needs this, otherwise it fails with not being able
+        # to find GCP credentials. This is fine as it's read-only, but not
+        # great that it actually needs some credentials to pass this step
+        TERRAFORM_GCP_RO: ${{secrets.TERRAFORM_GCP_RO}}
 
     - name: Populate GCP RO secret
       run: echo "$TERRAFORM_GCP_RO" > /tmp/terraform-ro.json
