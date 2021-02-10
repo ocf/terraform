@@ -31,7 +31,9 @@ jobs:
         TERRAFORM_GCP_RO: ${{secrets.TERRAFORM_GCP_RO}}
 
     - name: Terraform plan
-      run: make plan | tee /tmp/terraform-plan-output
+      # This grep is here so that the output is slimmed down to only show changes
+      # and not all the refreshing of resource or initialization of things
+      run: make plan | grep --color=never -E '(^.*[#~+-] .*|^[[:punct:]]|Plan|No changes)' | tee /tmp/terraform-plan-output
       env:
         GOOGLE_APPLICATION_CREDENTIALS: '/tmp/terraform-ro.json'
 

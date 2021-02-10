@@ -51,7 +51,7 @@ bin/terraform:
 
 .PHONY: plan
 plan: bin/terraform
-	$(foreach project, $(wildcard $(REPO_ROOT)/projects/*), echo $(project) && cd $(project) && $(TF_PATH) init && $(TF_PATH) plan;)
+	$(foreach project, $(wildcard $(REPO_ROOT)/projects/*), echo $(project) && cd $(project) && $(TF_PATH) init && $(TF_PATH) plan -no-color;)
 
 .PHONY: apply
 apply: bin/terraform
