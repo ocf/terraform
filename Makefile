@@ -51,13 +51,17 @@ bin/terraform:
 
 .PHONY: plan
 plan: bin/terraform
-	$(foreach project, $(wildcard $(REPO_ROOT)/projects/*), echo $(project) && cd $(project) && $(TF_PATH) init && $(TF_PATH) plan -no-color;)
+	$(foreach project, $(wildcard $(REPO_ROOT)/projects/*), echo $(project) && cd $(project) && $(TF_PATH) init && $(TF_PATH) plan;)
+
+.PHONY: plan
+auto-plan: bin/terraform
+	$(foreach project, $(wildcard $(REPO_ROOT)/projects/*), ./bin/autoplan-project $(TF_PATH) $(project);)
 
 .PHONY: apply
 apply: bin/terraform
 	$(foreach project, $(wildcard $(REPO_ROOT)/projects/*), echo $(project) && cd $(project) && $(TF_PATH) init && $(TF_PATH) apply;)
 
-.PHONY: force-apply
-force-apply: bin/terraform
+.PHONY: auto-apply
+auto-apply: bin/terraform
 	# Don't do this unless you know what you're doing, there's no confirmation before actually applying any changes!
 	$(foreach project, $(wildcard $(REPO_ROOT)/projects/*), echo $(project) && cd $(project) && $(TF_PATH) init && $(TF_PATH) apply -auto-approve;)

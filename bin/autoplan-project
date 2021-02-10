@@ -1,0 +1,16 @@
+#!/bin/bash
+
+tf_path=$1
+project=$2
+
+# Add a header
+echo -e "# \`projects/$(basename "${project}")\`\n"
+
+# Add some code-block markdown formatting things around the terraform plan output
+echo "\`\`\`"
+cd "${project}" || exit
+${tf_path} init -lock=false > /dev/null
+# Only output the parts of the plan that show what is going to happen, since we
+# don't care about updating resource states or that kind of thing
+${tf_path} plan -lock=false -no-color | sed -n '/^An execution plan/,$p; /^No changes. Infrastructure is up-to-date./,$p'
+echo -e "\`\`\`\n"
