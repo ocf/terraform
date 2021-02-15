@@ -1,4 +1,4 @@
-TF_VERSION := 0.12.29
+TF_VERSION := 0.14.6
 TF_ZIP_FILE = terraform_${TF_VERSION}_linux_amd64.zip
 TF_CHECKSUMS_FILE = terraform_${TF_VERSION}_SHA256SUMS
 TF_CHECKSUMS_SIG_FILE = $(TF_CHECKSUMS_FILE).sig
@@ -18,7 +18,7 @@ install-hooks: venv
 	$(REPO_ROOT)/venv/bin/pre-commit install -f --install-hooks
 
 .PHONY: test
-test: venv install-hooks
+test: venv install-hooks bin/terraform
 	$(REPO_ROOT)/venv/bin/pre-commit run --all-files
 
 # Set up the terraform binary, with some validation to make sure it's trusted
@@ -53,11 +53,15 @@ bin/terraform:
 plan: bin/terraform
 	$(foreach project, $(wildcard $(REPO_ROOT)/projects/*), echo $(project) && cd $(project) && $(TF_PATH) init && $(TF_PATH) plan;)
 
+.PHONY: plan
+auto-plan: bin/terraform
+	$(foreach project, $(wildcard $(REPO_ROOT)/projects/*), ./bin/autoplan-project $(TF_PATH) $(project);)
+
 .PHONY: apply
 apply: bin/terraform
 	$(foreach project, $(wildcard $(REPO_ROOT)/projects/*), echo $(project) && cd $(project) && $(TF_PATH) init && $(TF_PATH) apply;)
 
-.PHONY: force-apply
-force-apply: bin/terraform
+.PHONY: auto-apply
+auto-apply: bin/terraform
 	# Don't do this unless you know what you're doing, there's no confirmation before actually applying any changes!
 	$(foreach project, $(wildcard $(REPO_ROOT)/projects/*), echo $(project) && cd $(project) && $(TF_PATH) init && $(TF_PATH) apply -auto-approve;)

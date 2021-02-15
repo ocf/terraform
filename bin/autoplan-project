@@ -1,0 +1,25 @@
+#!/bin/bash
+
+TF_PATH=$1
+PROJECT=$2
+
+PLAN_START="An execution plan has been generated and is shown below"
+NO_CHANGES="No changes. Infrastructure is up-to-date."
+
+cd "${PROJECT}" || exit
+${TF_PATH} init -lock=false > /dev/null
+# Only output the parts of the plan that show what is going to happen, since we
+# don't care about updating resource states or that kind of thing
+PLAN_OUTPUT=$(${TF_PATH} plan -lock=false -no-color | sed -n "/^${PLAN_START}/,\$p; /^${NO_CHANGES}/,\$p")
+
+SUMMARY=$(echo "${PLAN_OUTPUT}" | grep -E "(^Plan:|${NO_CHANGES})")
+
+# Create a collapsible section using GitHub-Flavored Markdown (GFM)
+echo "<details>"
+echo -e "<summary>projects/$(basename "${PROJECT}") (${SUMMARY})</summary>\n"
+
+# Add some code-block markdown formatting things around the terraform plan output
+echo "\`\`\`"
+echo "${PLAN_OUTPUT}"
+echo "\`\`\`"
+echo -e "</details>\n"

@@ -19,11 +19,16 @@ jobs:
     - name: Checkout repo
       uses: actions/checkout@v2
 
-    - name: Run tests
-      run: make test
-
     - name: Setup terraform
       run: make bin/terraform
+
+    - name: Run tests
+      run: make test
+      env:
+        # terraform-validate needs this, otherwise it fails with not being able
+        # to find GCP credentials. This is fine as it's read-only, but not
+        # great that it actually needs some credentials to pass this step
+        TERRAFORM_GCP_RO: ${{secrets.TERRAFORM_GCP_RO}}
 
     - name: Populate GCP RO secret
       run: echo "$TERRAFORM_GCP_RO" > /tmp/terraform-ro.json
@@ -31,9 +36,28 @@ jobs:
         TERRAFORM_GCP_RO: ${{secrets.TERRAFORM_GCP_RO}}
 
     - name: Terraform plan
-      run: make plan
+      # This grep is here so that the output is slimmed down to only show changes
+      # and not all the refreshing of resource or initialization of things
+      run: make --quiet auto-plan | tee /tmp/terraform-plan-output
       env:
         GOOGLE_APPLICATION_CREDENTIALS: '/tmp/terraform-ro.json'
+
+    - name: Comment plan on pull request
+      if: github.ref != 'refs/heads/master'
+      uses: actions/github-script@v3
+      with:
+        script: |
+          const { promises: fs } = require('fs')
+          // Read in terraform plan content from the previous step so that it
+          // can be put into a pull request comment
+          const content = await fs.readFile('/tmp/terraform-plan-output', 'utf8')
+
+          github.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: content,
+          })
 
     - name: Populate GCP RW secret
       if: github.ref == 'refs/heads/master' && github.event_name == 'push'
@@ -44,6 +68,6 @@ jobs:
     # On push to master, apply terraform changes
     - name: Terraform apply
       if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-      run: make force-apply
+      run: make auto-apply
       env:
         GOOGLE_APPLICATION_CREDENTIALS: '/tmp/terraform-rw.json'
