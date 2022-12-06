@@ -20,3 +20,8 @@ To locally plan or apply, you'll need to export a `GITHUB_TOKEN` environment
 variable with a personal access token. Again, depending on your access, this
 may not let you plan or apply on all resources, so relying on the plan on a PR
 and the apply after merging to master is probably best.
+
+## Vault
+You'll need to set `VAULT_TOKEN` to a valid Vault token, and
+`VAULT_ADDR=https://vault.ocf.berkeley.edu/`.
+
